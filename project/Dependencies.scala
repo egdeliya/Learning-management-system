@@ -7,6 +7,7 @@ object Dependencies {
     val slick = "3.2.1"
     val logback = "1.2.3"
     val logging = "3.9.0"
+    val jodaTime = "2.10.1"
   }
 
   val configTypesafe = Seq (
@@ -14,7 +15,7 @@ object Dependencies {
   )
   
   val sql = Seq(
-    "org.xerial" % "sqlite-jdbc" % version.sql,
+    "com.h2database" % "h2" % "1.4.192",
     "com.typesafe.slick" %% "slick" % version.slick,
     "org.slf4j" % "slf4j-simple" % "1.7.12",
     "com.typesafe.slick" %% "slick-hikaricp" % "3.2.0",
@@ -30,5 +31,9 @@ object Dependencies {
   val logging = Seq (
     "ch.qos.logback" % "logback-classic" % version.logback,
     "com.typesafe.scala-logging" %% "scala-logging" % version.logging
+  )
+
+  val jodaTime = Seq (
+    "joda-time" % "joda-time" % version.jodaTime
   )
 }

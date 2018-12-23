@@ -8,7 +8,8 @@ val commonSettings = Seq(
   scalaVersion := "2.12.4",
   libraryDependencies ++= configTypesafe,
   libraryDependencies ++= scalaTest,
-  libraryDependencies ++= logging
+  libraryDependencies ++= logging,
+  libraryDependencies ++= jodaTime
 )
 
 lazy val adminModule = (project in file("AdminModule"))

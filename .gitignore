@@ -21,8 +21,8 @@ build/
 .cache-main
 
 #database file
-lmsdb
-.sqliteman
+lmsdbtest.*
+lmsdb.*
 
 **/project/target
 **/project/project/target

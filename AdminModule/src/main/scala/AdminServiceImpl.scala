@@ -1,5 +1,4 @@
 import Domain.Models._
-
 import dbservice.DatabaseService
 
 import com.typesafe.scalalogging.Logger
@@ -18,7 +17,9 @@ class AdminServiceImpl(private val dbService: DatabaseService)
                   facultyName: String,
                   courseNum: Int): Future[Unit] = {
     Try {
-      dbService.createGroup(Group(groupName, facultyName, courseNum))
+      Group(groupName, facultyName, courseNum)
+    }.map { group =>
+      dbService.createGroup(group)
     } match {
       case Success(value) => value
       case Failure(ex) =>
@@ -30,7 +31,9 @@ class AdminServiceImpl(private val dbService: DatabaseService)
   def createCourse(courseName: String,
                    courseDescription: String): Future[Unit] = {
     Try {
-      dbService.createCourse(Course(courseName, courseDescription))
+      Course(courseName, courseDescription)
+    }.map { course =>
+      dbService.createCourse(course)
     } match {
       case Success(value) => value
       case Failure(ex) =>
@@ -42,21 +45,11 @@ class AdminServiceImpl(private val dbService: DatabaseService)
   def addGroupToCourse(groupName: String,
                        courseName: String): Future[Unit] = {
     dbService.addGroupToCourse(groupName, courseName)
-      .recover {
-        case ex: Throwable =>
-          log.debug(s"addGroupToCourse: failed adding group ${groupName} to course ${courseName}")
-          Future.failed(ex)
-      }
   }
 
   def addTeacherToCourse(teacherId: Int,
                          courseName: String): Future[Unit] = {
     dbService.addTeacherToCourse(teacherId, courseName)
-      .recover {
-        case ex: Throwable =>
-          log.debug(s"addTeacherToCourse: failed adding teacher ${teacherId} to course ${courseName}")
-          Future.failed(ex)
-      }
   }
 
   def addStudent(name: String,
@@ -66,24 +59,20 @@ class AdminServiceImpl(private val dbService: DatabaseService)
                  entryYear: Int,
                  grade: String,
                  form: String,
-                 basis: String): Future[Unit] = {
+                 basis: String): Future[(String, Int)] = {
     Try {
       val user = User(None, name, surname, patronymic)
-      val student = Student(user,
-                    group,
-                    EntryYear(entryYear),
-                    Degree(grade),
-                    EducationForm(form),
-                    Basis(basis))
+      Student(user,
+              group,
+              EntryYear(entryYear),
+              Degree(grade),
+              EducationForm(form),
+              Basis(basis))
 
+    }.map { student =>
       dbService.addStudent(student)
-        .recover {
-          case ex: Throwable =>
-            log.warn(s"addStudent: failed with message ${ex.getMessage}")
-            Future.failed(ex)
-        }
     } match {
-      case Success(_) => Future.successful()
+      case Success(value) => value
       case Failure(ex) =>
         log.warn(s"addStudent: failed adding Student")
         Future.failed(ex)
@@ -92,9 +81,10 @@ class AdminServiceImpl(private val dbService: DatabaseService)
 
   def addTeacher(name: String,
                  surname: String,
-                 patronymic: String): Future[Unit] = {
+                 patronymic: String): Future[(String, Int)] = {
     Try {
-      val user = User(None, name, surname, patronymic)
+      User(None, name, surname, patronymic)
+    }.map { user =>
       dbService.addTeacher(Teacher(user))
     } match {
       case Success(value) => value

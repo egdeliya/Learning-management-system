@@ -22,10 +22,10 @@ trait AdminService {
                  entryYear: Int,
                  grade: String,
                  form: String,
-                 basis: String): Future[Unit]
+                 basis: String): Future[(String, Int)]
 
   def addTeacher(name: String,
                  surname: String,
-                 patronymic: String): Future[Unit]
+                 patronymic: String): Future[(String, Int)]
 
 }

@@ -1,6 +1,6 @@
 package Domain.Slick
 
-import slick.jdbc.SQLiteProfile.api._
+import slick.jdbc.H2Profile.api._
 //import Users.users
 
 package object Students {
@@ -15,7 +15,6 @@ package object Students {
     def form: Rep[String] = column[String]("FORM")
     def basis: Rep[String] = column[String]("BASIS")
 
-//    def user = foreignKey("fk_teacher", id, Users)(_.id, onUpdate=ForeignKeyAction.Restrict, onDelete=ForeignKeyAction.Cascade)
     def idx = index("idx_students", id, unique = true)
     def * = (id, group, entryYear, grade, form, basis)
   }

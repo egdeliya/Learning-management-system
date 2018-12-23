@@ -1,6 +1,6 @@
 package dbservice
 
-import slick.jdbc.SQLiteProfile.api._
+import slick.jdbc.H2Profile.api._
 import slick.jdbc.meta.MTable
 
 import Domain.Slick.Courses.courses
@@ -10,26 +10,21 @@ import Domain.Slick.TeacherToCourse.teacherToCourse
 import Domain.Slick.Users.users
 import Domain.Slick.Teachers.teachers
 import Domain.Slick.Students.students
-
-
-import com.typesafe.scalalogging.Logger
-import org.slf4j.LoggerFactory
+import Domain.Slick.Tokens.tokens
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-object DatabaseManager {
+class DatabaseManager(dbPath: String) {
 
-  private lazy val db = initDb
-  private val tables = List(courses, groups, groupToCourse, teacherToCourse, users, students, teachers)
-  private val log = Logger(LoggerFactory.getLogger(this.getClass))
+  private lazy val db = initDb()
+  private val tables = List(courses, groups, groupToCourse, teacherToCourse, users, teachers, students, tokens)
 
-  def initDb = Database.forConfig("lmsdb")
+  def initDb() = Database.forConfig(dbPath)
 
   def exec[T](action: DBIO[T]): Future[T] = db.run(action)
 
-//  TODO don't forget to call it on Application termination
   def close: Unit = {
     db.close()
   }
