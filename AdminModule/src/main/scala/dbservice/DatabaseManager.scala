@@ -51,27 +51,8 @@ class DatabaseManager(dbPath: String) {
     )
   }
 
-  def createTableIfNotInExists(tableName: String): Unit = {
-    Await.ready(
-      exec(MTable.getTables)
-        .flatMap(tablesVector => {
-          val tablesNames = tablesVector.map(mTable => mTable.name.name)
-          if (!tablesNames.contains(tableName))
-            exec(DBIO.seq(tables(tableName).schema.create))
-          else
-            Future.successful()
-        }),
-      Duration.Inf
-    )
-  }
-
   def dropTables(): Unit = {
     val dropTables = tables.values.map(_.schema.drop)
     Await.ready(exec(DBIO.sequence(dropTables)), Duration.Inf)
-  }
-
-  def dropTable(tableName: String): Unit = {
-    val dropTable = tables(tableName).schema.drop
-    Await.ready(exec(DBIO.seq(dropTable)), Duration.Inf)
   }
 }
