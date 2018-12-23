@@ -8,28 +8,26 @@ import Domain.Slick.TeacherToCourse._
 import Domain.Slick.Users._
 import Domain.Slick.Students._
 import Domain.Slick.Teachers._
-import com.typesafe.scalalogging.Logger
+import Domain.Slick.Tokens._
+
+import org.joda.time.DateTime
+import java.sql.Date
+import java.util.UUID
 
 import dbservice.exceptions._
-
-import org.slf4j.LoggerFactory
-import slick.jdbc.SQLiteProfile.api._
+import slick.jdbc.H2Profile.api._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class DatabaseServiceImpl extends DatabaseService {
-
-  import DatabaseManager._
-
-  private val log = Logger(LoggerFactory.getLogger(this.getClass))
+class DatabaseServiceImpl(private val database: DatabaseManager) extends DatabaseService {
 
   def createGroup(group: Group): Future[Unit] = {
-    exec(DBIO.seq(groups += group))
+    database.exec(DBIO.seq(groups += group))
   }
 
   def createCourse(course: Course): Future[Unit] = {
-    exec(DBIO.seq(courses += course))
+    database.exec(DBIO.seq(courses += course))
   }
 
   private def checkCourseExistence(courseName: String): Future[Boolean] = {
@@ -37,7 +35,7 @@ class DatabaseServiceImpl extends DatabaseService {
       _ <- courses.filter(_.name === courseName)
     } yield courseName
 
-    exec(foundCourses.result)
+    database.exec(foundCourses.result)
       .map(courses => courses.nonEmpty)
   }
 
@@ -46,7 +44,7 @@ class DatabaseServiceImpl extends DatabaseService {
       _ <- groups.filter(_.name === groupName)
     } yield groupName
 
-    exec(foundGroup.result)
+    database.exec(foundGroup.result)
       .map(groups => {
         groups.nonEmpty
       })
@@ -67,7 +65,7 @@ class DatabaseServiceImpl extends DatabaseService {
           throw new IllegalArgumentException(s"no course $courseName and group $groupName")
 
         case _ =>
-          exec(DBIO.seq(groupToCourse += (groupName, courseName)))
+          database.exec(DBIO.seq(groupToCourse += (groupName, courseName)))
       }
   }
 
@@ -76,7 +74,7 @@ class DatabaseServiceImpl extends DatabaseService {
       _ <- teachers.filter(_.id === teacherId)
     } yield teacherId
 
-    exec(foundTeacher.result)
+    database.exec(foundTeacher.result)
       .map(teachers => teachers.nonEmpty)
   }
 
@@ -95,41 +93,52 @@ class DatabaseServiceImpl extends DatabaseService {
           throw new IllegalArgumentException(s"no course $courseName and teacher with id $teacherId")
 
         case _ =>
-          exec(DBIO.seq(teacherToCourse += (teacherId, courseName)))
+          database.exec(DBIO.seq(teacherToCourse += (teacherId, courseName)))
       }
   }
 
-  def addStudent(student: Student): Future[Int] = {
+  private def generateUserToken(uid: Int, role: String): Future[String] = {
+    val token = UUID.randomUUID()
+
+    // TODO add token duration to config
+    val expired = new Date(DateTime.now.plusMinutes(10).getMillis)
+
+    database.exec(DBIO.seq(tokens += (uid, token, role, expired)))
+      .map(_ => token.toString)
+  }
+
+  def addStudent(student: Student): Future[(String, Int)] = {
     checkGroupExistence(student.group)
       .flatMap {
         case groupExist if groupExist =>
-          exec(users returning users.map(_.id) ++= Seq(student.user))
+          database.exec(users returning users.map(_.id) ++= Seq(student.user))
             .flatMap {
               ids => {
-                exec(DBIO.seq(students += (ids.head,
+                database.exec(DBIO.seq(students += (ids.head,
                   student.group,
                   student.entryYear.value,
-                  student.grade.value,
+                  student.degree.value,
                   student.educationForm.value,
                   student.basis.value
                 )))
-                  .map(_ => ids.head)
+                  .flatMap(_ => generateUserToken(ids.head, "student"))
+                  .map(token => (token, ids.head))
               }
             }
 
         case groupExist if !groupExist =>
-          log.warn(s"group ${student.group} does not exist")
           throw GroupNotFoundException(s"group ${student.group} does not exist", null)
       }
   }
 
-  def addTeacher(teacher: Teacher): Future[Int] = {
-    val teacherId = exec(users returning users.map(_.id) ++= Seq(teacher.user))
+  def addTeacher(teacher: Teacher): Future[(String, Int)] = {
+    val teacherId = database.exec(users returning users.map(_.id) ++= Seq(teacher.user))
     teacherId
       .flatMap {
         ids =>
-          exec(DBIO.seq(teachers += ids.head))
-            .map(_ => ids.head)
+          database.exec(DBIO.seq(teachers += ids.head))
+            .flatMap(_ => generateUserToken(ids.head, "teacher"))
+            .map(token => (token, ids.head))
       }
   }
 }

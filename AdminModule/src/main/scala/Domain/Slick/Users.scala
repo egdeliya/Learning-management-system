@@ -4,7 +4,7 @@ import Domain.Models.User
 import Students._
 import Teachers._
 
-import slick.jdbc.SQLiteProfile.api._
+import slick.jdbc.H2Profile.api._
 
 package object Users {
 
@@ -17,7 +17,7 @@ package object Users {
     def patronymic: Rep[String] = column[String]("PATRONYMIC")
 
 //    def student = foreignKey("fk_student", id, students)(_.id, onUpdate=ForeignKeyAction.Restrict, onDelete=ForeignKeyAction.Cascade)
-    def teacher = foreignKey("fk_teacher", id, teachers)(_.id, onUpdate=ForeignKeyAction.Restrict, onDelete=ForeignKeyAction.Cascade)
+//    def teacher = foreignKey("fk_teacher", id, teachers)(_.id, onUpdate=ForeignKeyAction.Restrict, onDelete=ForeignKeyAction.Cascade)
     def idx = index("idx_users", id, unique = true)
     def * = (id.?, name, surname, patronymic) <> (User.tupled, User.unapply)
   }

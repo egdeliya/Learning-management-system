@@ -1,7 +1,7 @@
 package Domain.Slick
 
 import Domain.Models.Group
-import slick.jdbc.SQLiteProfile.api._
+import slick.jdbc.H2Profile.api._
 
 package object Groups {
 
