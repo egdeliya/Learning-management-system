@@ -10,10 +10,10 @@ object ApplicationApp extends App {
   val conf = ConfigFactory.load()
   val dbManager = new DatabaseManager("lmsdb")
   dbManager.createTablesIfNotInExists()
-  val database = new AuthServiceImpl(dbManager)
+  val authService = new AuthServiceImpl(dbManager)
   val refreshTokenStorage = new RefreshTokenStorageImpl(dbManager)
   val userSessionManager = new UserSessionManager(conf)
 
-  val webServer = new WebServer(database, conf, userSessionManager, refreshTokenStorage)
+  val webServer = new WebServer(authService, conf, userSessionManager, refreshTokenStorage)
   webServer.run()
 }

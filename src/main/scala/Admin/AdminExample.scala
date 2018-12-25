@@ -71,8 +71,18 @@ object AdminExample extends App with testData {
       .zip(createCourses())
       .flatMap(_ => addGroupsToCourses())
       .flatMap(_ => addTeachers())
-      .flatMap(teachersData => addTeachersToCourses(teachersData.unzip._2))
+      .flatMap {
+        teachersData =>
+          println("\n\n Awailable tokens!")
+          teachersData.foreach(tokenIdPair => println(tokenIdPair._1))
+          addTeachersToCourses(teachersData.unzip._2)
+      }
       .flatMap(_ => addStudents())
+        .map {
+          studentsData =>
+            studentsData.foreach(tokenIdPair => println(tokenIdPair._1))
+          println()
+        }
 
     Await.result(adminActions, Duration.Inf)
   }
