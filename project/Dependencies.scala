@@ -8,6 +8,9 @@ object Dependencies {
     val logback = "1.2.3"
     val logging = "3.9.0"
     val jodaTime = "2.10.1"
+    val akkaHttp = "10.0.9"
+    val akka = "2.5.19"
+    val akkaSession = "0.5.6"
   }
 
   val configTypesafe = Seq (
@@ -35,5 +38,18 @@ object Dependencies {
 
   val jodaTime = Seq (
     "joda-time" % "joda-time" % version.jodaTime
+  )
+
+  val akka = Seq(
+    "com.typesafe.akka" %% "akka-http" % version.akkaHttp,
+    "com.typesafe.akka" %% "akka-stream" % "2.5.19",
+    "com.typesafe.akka" %% "akka-http-spray-json" % version.akkaHttp,
+    "com.typesafe.akka" %% "akka-actor" % version.akka,
+    "com.typesafe.akka" %% "akka-http-testkit" % version.akkaHttp,
+    "com.softwaremill.akka-http-session" %% "core" % version.akkaSession
+  )
+
+  val bcrypt = Seq(
+    "org.mindrot" % "jbcrypt" % "0.3m"
   )
 }
