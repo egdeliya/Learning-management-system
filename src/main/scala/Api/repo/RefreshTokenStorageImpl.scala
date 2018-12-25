@@ -13,6 +13,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+// Используется для хранения данных пользовательской сессии
 class RefreshTokenStorageImpl(private val database: DatabaseManager)
   extends RefreshTokenStorage[UserSession]
   with StrictLogging {

@@ -4,7 +4,7 @@ import Api.repo.{AuthService, Email, Password}
 import Api.session.{UserSession, UserSessionManager}
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{HttpResponse, StatusCode, StatusCodes}
+import akka.http.scaladsl.model.HttpResponse
 import akka.http.scaladsl.server.{Directives, ExceptionHandler}
 import akka.stream.ActorMaterializer
 import com.softwaremill.session.CsrfDirectives._

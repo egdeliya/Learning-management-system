@@ -9,6 +9,7 @@ import Domain.Slick.tables.TeacherToCourse.teacherToCourse
 import Domain.Slick.tables.Teachers.teachers
 import Domain.Slick.tables.Tokens.tokens
 import Domain.Slick.tables.Users.users
+import Domain.Slick.tables.Profiles.profiles
 import slick.jdbc.H2Profile.api._
 import slick.jdbc.meta.MTable
 

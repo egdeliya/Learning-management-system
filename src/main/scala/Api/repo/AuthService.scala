@@ -1,6 +1,5 @@
 package Api.repo
 
-import Api.repo
 import exceptions.{IncorrectEmailException, WeakPasswordException}
 
 import scala.concurrent.Future
@@ -48,7 +47,15 @@ class Password private (private val value: String) {
 
 trait AuthService {
 
+  /**
+    * Вход пользователя по e-mail и паролю
+    * @return Future от userId, userRole - ("teacher", "student")
+    */
   def login(email: String, password: String): Future[(Long, String)]
 
+  /**
+    * Регистрация пользователя по токену, e-mail и паролю
+    * @return Future.successful() - в случае удачи, Future.failed() иначе
+    */
   def register(token: String, email: Email, password: Password): Future[Unit]
 }
